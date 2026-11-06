@@ -10,6 +10,8 @@ const config: CapacitorConfig = {
   appId: 'kr.nirangnae.chat',
   appName: '니랑내',
   webDir: 'www',
+  loggingBehavior: 'none',
+  android: { webContentsDebuggingEnabled: false },
   ...(server ? { server: { url: server.origin, cleartext: false } } : {}),
 };
 export default config;

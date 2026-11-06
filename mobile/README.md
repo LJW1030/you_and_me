@@ -69,3 +69,20 @@ Android Studio 없이 Docker Desktop과 Node로 생성할 수 있습니다.
 
 결과는 artifacts/nirangnae-test.apk입니다. 현재 주소가 앱에 포함되므로 터널 주소가 변경되면 새 APK가 필요합니다.
 서명 키는 nirangnae-android-signing Docker 볼륨에 저장됩니다. 이 볼륨은 다른 PC로 자동 이동하지 않습니다. 동일 앱 업데이트를 유지하려면 키를 안전하게 백업/복원하세요. 키가 달라지면 기존 앱 삭제가 필요하며 기기 로그인 정보가 사라질 수 있습니다.
+
+## 릴리스 서명 / 보안 경고 확인
+
+1.0.1부터 release APK는 디버그 및 WebView 디버깅·로그를 비활성화하고 HTTP 평문 통신과 앱 백업을 금지합니다. 패키지 ID는 그대로 유지합니다. 인터넷 권한만 앱 코드에서 선언합니다.
+
+```powershell
+$env:MOBILE_TEST_URL='https://현재-테스트-주소'
+npm.cmd --prefix mobile run sync:test -- android
+docker run --rm -v "${PWD}:/workspace" -v nirangnae-android-gradle:/root/.gradle -v nirangnae-release-signing:/signing nirangnae-android-builder bash /workspace/mobile/scripts/build-release.sh
+```
+
+결과: artifacts/nirangnae-1.0.1.apk. 배포용 키와 비밀번호는 nirangnae-release-signing 볼륨에만 저장됩니다. 키와 비밀번호를 함께 안전하게 백업해야 하며 Git에 넣지 않습니다.
+기존 디버그 APK와 서명이 달라 바로 덮어쓰는 업데이트는 불가능합니다. 기존 앱을 삭제하면 기기 내 로그인 정보는 사라지지만 서버 계정과 대화는 유지됩니다.
+
+릴리스 서명 검증은 Google Play Protect의 악성/유해 판정을 통과했다는 뜻이 아닙니다. 유해 앱 경고가 계속되면 설치나 실행을 강행하지 않고 경고 문구·발생 단계·검사 제품을 확인해야 합니다. 오탐 의심 시 Google 공식 개발자 안내에 따라 재검토를 요청합니다. 보안 검사 비활성화, 패키지 ID 변경을 통한 탐지 회피는 해결 방법으로 사용하지 않습니다.
+공식 안내: https://developers.google.com/android/play-protect/warning-dev-guidance
+현재 원격 웹 로딩/임시 주소는 여전히 기기 테스트용이며 정식 스토어 출시 준비가 완료된 것은 아닙니다.
