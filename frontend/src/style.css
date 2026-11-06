@@ -1,0 +1,268 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  color: #263c35;
+  background: #f6f8f5;
+}
+button,
+input,
+textarea {
+  font: inherit;
+}
+button {
+  cursor: pointer;
+  border: 0;
+  border-radius: 12px;
+  padding: 12px;
+  background: #e5eee8;
+  color: #234f3d;
+}
+button:hover {
+  background: #d5e5d8;
+}
+button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+input,
+textarea {
+  border: 1px solid #dce4de;
+  border-radius: 10px;
+  padding: 12px;
+  min-width: 0;
+}
+h1 {
+  letter-spacing: -1.5px;
+}
+small,
+.muted {
+  color: #7a8c82;
+}
+small {
+  font-size: 12px;
+}
+nav {
+  display: flex;
+  gap: 8px;
+  margin: 24px 0;
+}
+nav button {
+  flex: 1;
+}
+.selected {
+  background: #cce1a9 !important;
+}
+.app {
+  display: flex;
+  height: 100dvh;
+  max-width: 1500px;
+  margin: auto;
+}
+aside {
+  width: 350px;
+  flex-shrink: 0;
+  padding: 28px;
+  background: #fff;
+  overflow: auto;
+  border-right: 1px solid #e5ebe6;
+}
+aside h1 {
+  margin: 0;
+}
+section h2 {
+  font-size: 19px;
+}
+section form {
+  display: flex;
+  gap: 5px;
+}
+section form input {
+  width: 100%;
+}
+.room {
+  display: block;
+  width: 100%;
+  text-align: left;
+  margin: 8px 0;
+  position: relative;
+  background: #f6f8f5;
+}
+.room p {
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin: 8px 0;
+  color: #75847c;
+}
+.room time {
+  float: right;
+  font-size: 10px;
+}
+.room b {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  border-radius: 20px;
+  background: #4b7651;
+  color: white;
+  padding: 2px 7px;
+}
+.person {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 0;
+}
+.person span {
+  flex: 1;
+}
+.person small {
+  display: block;
+}
+main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+header {
+  padding: 20px;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+header small {
+  margin-left: auto;
+}
+.messages {
+  overflow: auto;
+  flex: 1;
+  padding: 25px;
+  overflow-anchor: none;
+}
+article {
+  margin: 12px 0;
+  max-width: 75%;
+  width: fit-content;
+}
+.mine {
+  margin-left: auto;
+  text-align: right;
+}
+.bubble {
+  padding: 12px 17px;
+  background: white;
+  border-radius: 4px 18px 18px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  text-align: left;
+  line-height: 1.55;
+  margin: 5px 0;
+  box-shadow: 0 2px 4px #234f3d08;
+}
+.mine .bubble {
+  background: #d6e9b7;
+  border-radius: 18px 4px 18px 18px;
+}
+.date {
+  text-align: center;
+  color: #8a978f;
+  font-size: 12px;
+  margin: 24px;
+}
+footer {
+  padding: 20px;
+  display: flex;
+  gap: 12px;
+  background: white;
+}
+textarea {
+  flex: 1;
+  resize: none;
+  height: 70px;
+}
+.empty {
+  margin: auto;
+  text-align: center;
+  color: #778b80;
+}
+.logo {
+  font-size: 70px;
+  color: #578249;
+}
+.auth {
+  max-width: 390px;
+  margin: 9vh auto;
+  padding: 25px;
+  text-align: center;
+}
+.auth form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.auth form button {
+  background: #cce1a9;
+}
+.link {
+  background: transparent;
+  margin: 15px;
+}
+p[role="alert"] {
+  font-size: 12px;
+  color: #b34e44;
+  overflow-wrap: anywhere;
+}
+@media (max-width: 650px) {
+  aside {
+    width: 100%;
+    padding: 24px 20px 90px;
+  }
+  nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    margin: 0;
+    padding: 12px;
+    z-index: 2;
+    border-top: 1px solid #ddd;
+  }
+  .app:not(.opened) main {
+    display: none;
+  }
+  .opened aside {
+    display: none;
+  }
+  .messages {
+    padding: 14px;
+  }
+  footer {
+    padding: 12px;
+  }
+  article {
+    max-width: 85%;
+  }
+}
+.profile form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.auth label,
+.profile label {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  gap: 6px;
+}

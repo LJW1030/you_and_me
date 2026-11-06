@@ -1,0 +1,17 @@
+node_modules/
+dist/
+build/
+.gradle/
+.env
+.env.production
+
+*.jks
+*.keystore
+*.p12
+*.mobileprovision
+
+.idea/
+artifacts/
+.tools/
+*.log
+.env.*.local

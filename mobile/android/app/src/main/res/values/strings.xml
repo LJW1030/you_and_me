@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">니랑내</string>
+    <string name="title_activity_main">니랑내</string>
+    <string name="package_name">kr.nirangnae.chat</string>
+    <string name="custom_url_scheme">kr.nirangnae.chat</string>
+</resources>

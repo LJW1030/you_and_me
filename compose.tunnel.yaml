@@ -1,0 +1,8 @@
+﻿services:
+  backend:
+    environment:
+      SERVER_FORWARD_HEADERS_STRATEGY: framework
+  tunnel:
+    image: cloudflare/cloudflared:2026.2.0
+    command: tunnel --no-autoupdate --protocol http2 --url http://frontend:80
+    depends_on: [frontend]
