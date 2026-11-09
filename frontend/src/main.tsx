@@ -14,3 +14,7 @@ createRoot(document.getElementById("root")!).render(
     </BrowserRouter>
   </QueryClientProvider>,
 );
+
+const viewport=()=>document.documentElement.style.setProperty('--app-height',`${window.visualViewport?.height ?? window.innerHeight}px`);
+window.visualViewport?.addEventListener('resize',viewport);
+viewport();

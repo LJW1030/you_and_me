@@ -1,5 +1,8 @@
-﻿import { useState } from "react";
-import { api, qc, token, csrf } from "./api";
+import { enablePush } from "./useMobile";
+import { PushNotifications } from "@capacitor/push-notifications";
+import { Capacitor } from "@capacitor/core";
+import { useState, useEffect } from "react";
+import { api, qc, token, csrf, request } from "./api";
 export default function ProfilePage({
   me,
 }: {
@@ -7,6 +10,11 @@ export default function ProfilePage({
 }) {
   const [message, setMessage] = useState(""),
     [busy, setBusy] = useState(false);
+  useEffect(() => {
+    const status=(e:Event)=>setMessage((e as CustomEvent<string>).detail);
+    window.addEventListener('push-status',status);
+    return ()=>window.removeEventListener('push-status',status);
+  },[]);
   async function save(e: React.FormEvent<HTMLFormElement>, path: string) {
     e.preventDefault();
     const form = e.currentTarget;
@@ -32,6 +40,7 @@ export default function ProfilePage({
   return (
     <section className="profile">
       <h2>내 정보</h2>
+      {Capacitor.isNativePlatform() && <button onClick={async()=>{try{await enablePush();setMessage('알림 등록을 요청했습니다. 실제 수신 여부를 확인해주세요.');}catch(e){setMessage(String(e));}}}>메시지 알림 켜기</button>}
       <p>@{me.login}</p>
       <form onSubmit={(e) => save(e, "/me/profile")}>
         <label>
@@ -78,13 +87,17 @@ export default function ProfilePage({
       <p role="status">{message}</p>
       <button
         onClick={async () => {
+          try {
           await token();
-          await fetch("/api/logout", {
+          const response = await request("/api/logout", {
             method: "POST",
             headers: { [csrf.header]: csrf.token },
           });
+          if(!response.ok) throw new Error("로그아웃 실패. 연결을 확인하고 다시 시도하세요.");
+          if(Capacitor.isNativePlatform()) await PushNotifications.removeAllDeliveredNotifications().catch(()=>{});
           qc.clear();
           location.assign("/");
+          } catch(e) { setMessage(String(e)); }
         }}
       >
         로그아웃

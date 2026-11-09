@@ -75,7 +75,7 @@ export default function ChatRoom({
             }}
           >
             {[...messages, ...pending].map((m, i, all) => (
-              <React.Fragment key={m.client_id}>
+              <React.Fragment key={`${m.sender}:${m.client_id}`}>
                 {(i === 0 ||
                   new Date(m.sent_at).toDateString() !==
                     new Date(all[i - 1].sent_at).toDateString()) && (

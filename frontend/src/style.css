@@ -266,3 +266,10 @@ p[role="alert"] {
   text-align: left;
   gap: 6px;
 }
+
+/* Android WebView viewport and safe-area insets */
+.app {height: var(--app-height, 100dvh); padding-top:env(safe-area-inset-top);}
+.messages {min-height:0; overscroll-behavior:contain;}
+header, footer {flex-shrink:0;}
+footer {padding-bottom:max(12px,env(safe-area-inset-bottom));}
+@media(max-width:650px) {nav {padding-bottom:max(12px,env(safe-area-inset-bottom));}}

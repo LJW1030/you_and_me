@@ -1,5 +1,5 @@
-﻿import assert from "node:assert/strict";
-const base = "http://localhost:3000/api";
+import assert from "node:assert/strict";
+const base = (process.env.TEST_BASE_URL ?? "http://localhost:3000") + "/api";
 async function user(name) {
   let cookie = "",
     csrf;

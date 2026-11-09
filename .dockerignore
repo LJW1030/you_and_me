@@ -1,0 +1,14 @@
+**/node_modules
+**/build
+**/.gradle
+**/.git
+**/.env
+**/.env.local
+**/.env.production
+**/*.p12
+**/*.jks
+**/google-services.json
+**/*service-account*.json
+mobile
+tests
+artifacts

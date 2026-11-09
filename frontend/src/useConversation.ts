@@ -37,7 +37,7 @@ export function useConversation(
       ).sort((a, b) => a.seq - b.seq),
     );
     setPending((old) =>
-      old.filter((p) => !rows.some((m) => m.client_id === p.client_id)),
+      old.filter((p) => !rows.some((m) => m.client_id === p.client_id && m.sender === p.sender)),
     );
   }
   async function sync() {
@@ -68,9 +68,12 @@ export function useConversation(
         );
         if (active.current !== target) return;
       }
-      setMembers(await api(`/rooms/${target}/members`));
+      const currentMembers = await api(`/rooms/${target}/members`);
+      if(active.current !== target) return;
+      setMembers(currentMembers);
       if (bottom.current) {
         requestAnimationFrame(() => {
+          if(active.current !== target) return;
           scroll.current?.scrollTo(0, scroll.current.scrollHeight);
           markRead();
         });
@@ -136,10 +139,12 @@ export function useConversation(
         ),
       );
     try {
+      const target = room;
       const saved = await api(`/rooms/${room}/messages`, {
         clientMessageId: item.client_id,
         body,
       });
+      if(active.current !== target) return;
       merge([saved]);
       void syncRef.current();
     } catch {

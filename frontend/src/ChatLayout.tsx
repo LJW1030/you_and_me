@@ -1,3 +1,4 @@
+import { useMobile } from "./useMobile";
 import FriendsPage from "./FriendsPage";
 import ChatRoom from "./ChatRoom";
 import { useConversation } from "./useConversation";
@@ -5,7 +6,7 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 
-import { api, qc } from "./api";
+import { api, qc, ApiError } from "./api";
 import Auth from "./AuthPage";
 import ProfilePage from "./ProfilePage";
 export default function App() {
@@ -30,6 +31,7 @@ export default function App() {
     enabled: !!me.data,
   });
 
+  useMobile(me.data?.id);
   const conversation = useConversation(room, me, setError, setStatus);
   async function create(ids: number[]) {
     try {
@@ -49,7 +51,9 @@ export default function App() {
       setError(String(e));
     }
   }
-  if (me.isPending) return <main>니랑내를 여는 중…</main>;
+  if (me.isPending) return <main className="auth">니랑내를 여는 중… 무료 서버의 첫 연결은 1분 이상 걸릴 수 있습니다.</main>;
+  if(me.isError && !(me.error instanceof ApiError && me.error.status === 401))
+    return <main className="auth"><p role="alert">{String(me.error)}</p><button onClick={() => me.refetch()}>연결 다시 시도</button></main>;
   if (!me.data)
     return <Auth done={() => qc.invalidateQueries({ queryKey: ["me"] })} />;
   return (

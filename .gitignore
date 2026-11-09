@@ -16,3 +16,6 @@ artifacts/
 *.log
 .env.*.local
 *.dump
+**/google-services.json
+**/*service-account*.json
+**/local.properties

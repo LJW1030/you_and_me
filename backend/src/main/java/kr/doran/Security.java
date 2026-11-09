@@ -22,10 +22,10 @@ public class Security implements WebSocketMessageBrokerConfigurer {
         registration.addDecoratorFactory(liveSessions::decorate);
     }
     @Bean BCryptPasswordEncoder encoder() { return new BCryptPasswordEncoder(); }
-    @Bean SecurityFilterChain filter(HttpSecurity http) throws Exception {
-        return http.addFilterBefore(new AccountRateLimit(), org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class).csrf(c -> c.csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())).authorizeHttpRequests(a -> a.requestMatchers("/api/accounts/availability", "/api/csrf", "/api/register", "/api/login", "/error").permitAll().anyRequest().authenticated())
+    @Bean SecurityFilterChain filter(HttpSecurity http, PushService push) throws Exception {
+        return http.addFilterBefore(new AccountRateLimit(), org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class).csrf(c -> c.csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())).addFilterBefore(new RequestLimits(), org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class).authorizeHttpRequests(a -> a.requestMatchers("/", "/index.html", "/assets/**", "/rooms/*", "/healthz", "/api/accounts/availability", "/api/csrf", "/api/register", "/api/login", "/error").permitAll().anyRequest().authenticated())
             .formLogin(f -> f.loginProcessingUrl("/api/login").successHandler((q,s,a)->s.setStatus(204)).failureHandler((q,s,e)->s.sendError(401)))
-            .logout(l -> l.logoutUrl("/api/logout").logoutSuccessHandler((q,s,a)->s.setStatus(204)))
+            .logout(l -> l.logoutUrl("/api/logout").addLogoutHandler((q,s,a) -> { var session=q.getSession(false); if(session!=null) push.unregisterSession(session.getId()); if(a!=null) liveSessions.revoke(a.getName()); }).logoutSuccessHandler((q,s,a)->s.setStatus(204)))
             .exceptionHandling(e -> e.authenticationEntryPoint((q,s,x)->s.sendError(401))).build();
     }
     @Bean org.springframework.security.core.userdetails.UserDetailsService users(org.springframework.jdbc.core.JdbcTemplate db) {

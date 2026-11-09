@@ -1,6 +1,11 @@
 const { spawnSync } = require('node:child_process');
 const path = require('node:path');
 if (!process.env.MOBILE_TEST_URL) throw new Error('Set MOBILE_TEST_URL to the current HTTPS test origin first.');
+const fs = require('node:fs');
+const origin = new URL(process.env.MOBILE_TEST_URL);
+if(origin.protocol !== 'https:' || origin.pathname !== '/' || origin.search || origin.hash || origin.username || origin.password) throw new Error('HTTPS origin only');
+const offlinePath=path.join(__dirname,'../www/offline.html');
+fs.writeFileSync(offlinePath,fs.readFileSync(offlinePath,'utf8').replace(/location.replace\('[^']*'\)/, "location.replace('"+origin.origin+"')"));
 const platform = process.argv[2];
 if (platform && !['android', 'ios'].includes(platform)) throw new Error('Platform must be android or ios');
 const cli = path.join(__dirname, '../node_modules/@capacitor/cli/bin/capacitor');

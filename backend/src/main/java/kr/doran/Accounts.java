@@ -41,6 +41,7 @@ public class Accounts {
             if (!encoder.matches(body.getOrDefault("currentPassword", ""), hash))
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "현재 비밀번호가 일치하지 않습니다");
             db.update("update users set password=? where login=?", encoder.encode(body.get("password")), principal.getName());
+            db.update("delete from push_devices where usr=(select id from users where login=?)", principal.getName());
             db.update("delete from spring_session where principal_name=?", principal.getName());
         });
         request.getSession().invalidate();

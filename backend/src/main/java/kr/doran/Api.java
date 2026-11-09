@@ -19,15 +19,17 @@ public class Api {
     private final TransactionTemplate tx;
     private final SimpMessagingTemplate events;
     private final Mapper mapper;
-    Api(JdbcTemplate db, BCryptPasswordEncoder encoder, TransactionTemplate tx, SimpMessagingTemplate events, Mapper mapper) {
-        this.db=db; this.encoder=encoder; this.tx=tx; this.events=events; this.mapper=mapper;
+    private final PushService push;
+    private static final org.slf4j.Logger log=org.slf4j.LoggerFactory.getLogger(Api.class);
+    Api(JdbcTemplate db, BCryptPasswordEncoder encoder, TransactionTemplate tx, SimpMessagingTemplate events, Mapper mapper, PushService push) {
+        this.db=db; this.encoder=encoder; this.tx=tx; this.events=events; this.mapper=mapper; this.push=push;
     }
     long uid(Principal p) { return db.queryForObject("select id from users where login=?",Long.class,p.getName()); }
     void member(long room,long user) {
         if(db.queryForObject("select count(*) from members where room=? and usr=?",Integer.class,room,user)==0) throw new ResponseStatusException(HttpStatus.FORBIDDEN);
     }
     void emit(long room) {
-        for(var u:db.queryForList("select u.login from users u join members m on m.usr=u.id where m.room=?",room)) events.convertAndSendToUser((String)u.get("login"),"/queue/events",Map.of("room",room));
+        try { for(var u:db.queryForList("select u.login from users u join members m on m.usr=u.id where m.room=?",room)) events.convertAndSendToUser((String)u.get("login"),"/queue/events",Map.of("room",room)); } catch(Exception e) { log.warn("Realtime notification failed for room {}; history remains authoritative",room); }
     }
     @GetMapping("/csrf") Object csrf(CsrfToken token) { return Map.of("token",token.getToken(),"header",token.getHeaderName()); }
     @PostMapping("/register") void register(@RequestBody Map<String,String> b) {
@@ -51,6 +53,7 @@ public class Api {
     record Create(List<Long> members,String title) {}
     @PostMapping("/rooms") Object create(Principal p,@RequestBody Create b) {
         long id=uid(p);
+        if(b.members()==null || b.members().stream().anyMatch(Objects::isNull)) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         var ids=new TreeSet<Long>(b.members()); ids.remove(id);
         if(ids.isEmpty() || ids.size()>50) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         for(long friend:ids) if(db.queryForObject("select count(*) from friends where owner=? and friend=?",Integer.class,id,friend)==0) throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"친구를 선택하세요");
@@ -71,16 +74,19 @@ public class Api {
     @PostMapping("/rooms/{room}/messages") Object send(Principal p,@PathVariable long room,@RequestBody Send b) {
         long id=uid(p); member(room,id);
         if(b.clientMessageId()==null || b.body()==null || b.body().isBlank() || b.body().length()>2000) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        var inserted=new boolean[]{false};
         var result=tx.execute(s -> {
             db.queryForObject("select seq from rooms where id=? for update",Long.class,room);
             var old=db.queryForList("select * from messages where room=? and sender=? and client_id=?",room,id,b.clientMessageId());
             if(!old.isEmpty()) return old.get(0);
             long seq=db.queryForObject("update rooms set seq=seq+1 where id=? returning seq",Long.class,room);
+            inserted[0]=true;
             return db.queryForMap("insert into messages(room,seq,sender,client_id,body) values(?,?,?,?,?) returning *",room,seq,id,b.clientMessageId(),b.body());
-        }); emit(room); return result;
+        }); emit(room); if(inserted[0]) push.notifyRoom(room,id); return result;
     }
     @PostMapping("/rooms/{room}/read") void read(Principal p,@PathVariable long room,@RequestBody Map<String,Long> b) {
         long id=uid(p); member(room,id);
+        if(b.get("seq")==null || b.get("seq")<0) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
         db.update("update members set last_read=greatest(last_read,least(?,(select seq from rooms where id=?))) where room=? and usr=?",b.get("seq"),room,room,id); emit(room);
     }
 }

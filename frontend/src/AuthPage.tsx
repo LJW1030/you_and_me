@@ -1,5 +1,5 @@
-﻿import { useState } from "react";
-import { api, token, csrf } from "./api";
+import { useState } from "react";
+import { api, token, csrf, request } from "./api";
 export default function Auth({ done }: { done: () => void }) {
   const [register, setRegister] = useState(false),
     [error, setError] = useState(""),
@@ -34,7 +34,7 @@ export default function Auth({ done }: { done: () => void }) {
           try {
             await token();
             if (register) await api("/register", b);
-            const r = await fetch("/api/login", {
+            const r = await request("/api/login", {
               method: "POST",
               headers: {
                 "Content-Type": "application/x-www-form-urlencoded",

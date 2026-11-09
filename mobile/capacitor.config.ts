@@ -12,6 +12,6 @@ const config: CapacitorConfig = {
   webDir: 'www',
   loggingBehavior: 'none',
   android: { webContentsDebuggingEnabled: false },
-  ...(server ? { server: { url: server.origin, cleartext: false } } : {}),
+  ...(server ? { server: { url: server.origin, cleartext: false, errorPath: "offline.html" } } : {}),
 };
 export default config;

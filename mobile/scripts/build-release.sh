@@ -13,6 +13,6 @@ bash gradlew assembleRelease --no-daemon --max-workers=2
 mkdir -p /workspace/artifacts
 TOOLS=/opt/android-sdk/build-tools/36.0.0
 "$TOOLS/zipalign" -f -p 4 app/build/outputs/apk/release/app-release-unsigned.apk /workspace/artifacts/nirangnae-aligned.apk
-"$TOOLS/apksigner" sign --ks /signing/release.p12 --ks-key-alias nirangnae --ks-pass file:/signing/password --out /workspace/artifacts/nirangnae-1.0.1.apk /workspace/artifacts/nirangnae-aligned.apk
-"$TOOLS/apksigner" verify --verbose --print-certs /workspace/artifacts/nirangnae-1.0.1.apk
-"$TOOLS/aapt" dump badging /workspace/artifacts/nirangnae-1.0.1.apk
+"$TOOLS/apksigner" sign --ks /signing/release.p12 --ks-key-alias nirangnae --ks-pass file:/signing/password --out /workspace/artifacts/nirangnae-1.0.2.apk /workspace/artifacts/nirangnae-aligned.apk
+"$TOOLS/apksigner" verify --verbose --print-certs /workspace/artifacts/nirangnae-1.0.2.apk
+"$TOOLS/aapt" dump badging /workspace/artifacts/nirangnae-1.0.2.apk
