@@ -80,3 +80,5 @@ node tests/connection-stability.mjs
 이 검증은 45초 유휴 상태에서 하트비트 수신과 재연결 0회를 검사합니다. 임시 터널 만료, 서버 중단, OS의 앱 절전으로 발생하는 연결 종료까지 막을 수는 없습니다. 설치형 앱 배포에도 고정 HTTPS 백엔드가 필요합니다.
 
 Android/iOS 기기 테스트 프로젝트: [mobile/README.md](mobile/README.md). 현재 플랫폼 생성과 동기화까지 확인했으며 설치 파일 빌드는 별도 SDK 환경이 필요합니다.
+
+Oracle Cloud 무료 VM 배포: [설정 및 실행 절차](deploy/oracle/README.md).

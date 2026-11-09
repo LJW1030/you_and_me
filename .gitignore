@@ -15,3 +15,4 @@ artifacts/
 .tools/
 *.log
 .env.*.local
+*.dump
