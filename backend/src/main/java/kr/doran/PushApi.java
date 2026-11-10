@@ -11,7 +11,7 @@ public class PushApi {
     private final PushService push;
     private final Api api;
     PushApi(PushService push,Api api) { this.push=push; this.api=api; }
-    @GetMapping("/status") Object status() { return Map.of("enabled",push.enabled()); }
+    @GetMapping("/status") Object status(HttpServletRequest request) { return Map.of("enabled",push.enabled(),"registered",push.registered(request.getSession().getId()),"platform","android"); }
     record Device(String token) {}
     @PostMapping("/register") @Transactional
     void register(Principal principal,HttpServletRequest request,@RequestBody Device device) {

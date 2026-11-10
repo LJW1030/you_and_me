@@ -1,0 +1,10 @@
+const fs = require('node:fs');
+const path = require('node:path');
+const file = process.argv[2] || path.join(__dirname, '../android/app/google-services.json');
+if (!fs.existsSync(file)) throw new Error('Firebase Android 설정 파일이 없습니다: mobile/android/app/google-services.json');
+const config = JSON.parse(fs.readFileSync(file, 'utf8'));
+if (config.type === 'service_account' || config.private_key) throw new Error('서버 서비스 계정 비밀키를 앱에 넣으면 안 됩니다. Android google-services.json을 사용하세요.');
+if (!config.project_info?.project_id || !config.project_info?.project_number) throw new Error('Firebase 프로젝트 정보가 없습니다.');
+const client = config.client?.find(c => c.client_info?.android_client_info?.package_name === 'kr.nirangnae.chat');
+if (!client?.client_info?.mobilesdk_app_id || !client.api_key?.length) throw new Error('kr.nirangnae.chat Android 앱에 해당하는 설정이 없습니다.');
+console.log('Firebase Android 설정 구조/패키지 검사 통과. 계정 권한·실제 발송은 별도 검증이 필요합니다.');

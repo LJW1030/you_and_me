@@ -20,3 +20,8 @@ dependencies {
 tasks.named('test') { useJUnitPlatform() }
 dependencies { implementation 'org.springframework.security:spring-security-messaging' }
 dependencies { implementation 'org.springframework.session:spring-session-jdbc' }
+
+// Start Mockito's agent with the test JVM; CI environments may disallow self-attachment.
+configurations { mockitoAgent }
+dependencies { mockitoAgent('org.mockito:mockito-core') { transitive = false } }
+tasks.named('test') { jvmArgs "-javaagent:${configurations.mockitoAgent.singleFile}" }

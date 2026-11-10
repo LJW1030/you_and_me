@@ -1,4 +1,4 @@
-import { enablePush } from "./useMobile";
+import { enablePush, disablePush } from "./useMobile";
 import { PushNotifications } from "@capacitor/push-notifications";
 import { Capacitor } from "@capacitor/core";
 import { useState, useEffect } from "react";
@@ -40,7 +40,8 @@ export default function ProfilePage({
   return (
     <section className="profile">
       <h2>내 정보</h2>
-      {Capacitor.isNativePlatform() && <button onClick={async()=>{try{await enablePush();setMessage('알림 등록을 요청했습니다. 실제 수신 여부를 확인해주세요.');}catch(e){setMessage(String(e));}}}>메시지 알림 켜기</button>}
+      {Capacitor.getPlatform() === 'android' && <button onClick={async()=>{try{await enablePush();setMessage('알림 등록을 요청했습니다. 실제 수신 여부를 확인해주세요.');}catch(e){setMessage(String(e));}}}>메시지 알림 켜기</button>}
+      {Capacitor.getPlatform() === 'android' && <button onClick={async()=>{try{await disablePush();setMessage('이 기기의 메시지 알림을 껐습니다.');}catch(e){setMessage(String(e));}}}>메시지 알림 끄기</button>}
       <p>@{me.login}</p>
       <form onSubmit={(e) => save(e, "/me/profile")}>
         <label>

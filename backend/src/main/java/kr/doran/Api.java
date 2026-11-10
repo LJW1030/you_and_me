@@ -74,15 +74,15 @@ public class Api {
     @PostMapping("/rooms/{room}/messages") Object send(Principal p,@PathVariable long room,@RequestBody Send b) {
         long id=uid(p); member(room,id);
         if(b.clientMessageId()==null || b.body()==null || b.body().isBlank() || b.body().length()>2000) throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-        var inserted=new boolean[]{false};
         var result=tx.execute(s -> {
             db.queryForObject("select seq from rooms where id=? for update",Long.class,room);
             var old=db.queryForList("select * from messages where room=? and sender=? and client_id=?",room,id,b.clientMessageId());
             if(!old.isEmpty()) return old.get(0);
             long seq=db.queryForObject("update rooms set seq=seq+1 where id=? returning seq",Long.class,room);
-            inserted[0]=true;
-            return db.queryForMap("insert into messages(room,seq,sender,client_id,body) values(?,?,?,?,?) returning *",room,seq,id,b.clientMessageId(),b.body());
-        }); emit(room); if(inserted[0]) push.notifyRoom(room,id); return result;
+            var message=db.queryForMap("insert into messages(room,seq,sender,client_id,body) values(?,?,?,?,?) returning *",room,seq,id,b.clientMessageId(),b.body());
+            push.enqueue(room,seq,id); // Same transaction: no notification without a saved message.
+            return message;
+        }); emit(room); return result;
     }
     @PostMapping("/rooms/{room}/read") void read(Principal p,@PathVariable long room,@RequestBody Map<String,Long> b) {
         long id=uid(p); member(room,id);

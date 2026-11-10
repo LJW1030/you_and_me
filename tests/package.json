@@ -1,0 +1,1 @@
+{"name":"nirangnae-regression-tests","private":true,"type":"module","scripts":{"test:push":"node push-outbox.mjs"},"devDependencies":{"@electric-sql/pglite":"0.3.14"}}
