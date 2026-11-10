@@ -13,7 +13,7 @@ FROM eclipse-temurin:17-jre
 WORKDIR /app
 RUN useradd --system --uid 10001 app
 COPY --from=build /app/build/libs/*.jar app.jar
-USER app
+USER app:1000
 ENV JAVA_TOOL_OPTIONS="-XX:MaxRAMPercentage=55 -XX:+UseSerialGC -Xss512k"
 EXPOSE 8080
 ENTRYPOINT ["java","-jar","app.jar"]
